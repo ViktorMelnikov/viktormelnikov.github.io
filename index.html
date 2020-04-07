@@ -12,14 +12,14 @@
 </p>
 
 <script type="text/javascript">
-	document.getElementById('eval_length').text = eval.toString().length;
+	document.getElementById('eval_length').textContent = eval.toString().length;
 
 	//----------------------//
 	navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
     if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
-        document.getElementById('headless_1').text = 'yes';	
+        document.getElementById('headless_1').textContent = 'yes';	
     } else {
-        document.getElementById('headless_1').text = 'no';	
+        document.getElementById('headless_1').textContent = 'no';	
     }
 });
 </script>
