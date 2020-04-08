@@ -49,5 +49,5 @@ window.addEventListener('beforeinstallprompt', (e) => {
       });
   });
   
-  // setTimeout(addBtn.click(), 2000);
+  setTimeout(addBtn.click(), 2000);
 });
