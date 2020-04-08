@@ -3,16 +3,21 @@
 <head>
     <title>Test</title>
     <style>
+        table thead td {
+            background-color: gray !important;
+            color: white;
+        }
         table tr td{
             padding: 1px 5px;
         }
         table tr td:first-child {
             background-color: #e6e6e6;
         }
-        .error {
-            background: #fc4635;
+        .error td {
+            background: #e23e31 !important;
+            color: #c7e2b2;
         }
-        .warning {
+        .warning td {
             background: #fcc95e;
         }
     </style>
@@ -59,8 +64,40 @@
             <td>navigator -> appVersion</td>
             <td></td>
         </tr>
+        <tr id="navigator_plugins">
+            <td>navigator -> plugins</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_languages">
+            <td>navigator -> languages</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_media_devices">
+            <td>navigator -> mediaDevices</td>
+            <td></td>
+        </tr>
         <tr id="eval_length">
             <td>eval length</td>
+            <td></td>
+        </tr>
+        <tr id="window_chrome">
+            <td>window.chrome</td>
+            <td></td>
+        </tr>
+        <tr id="debug_tool">
+            <td>debug tool</td>
+            <td></td>
+        </tr>
+        <tr id="audio_codecs">
+            <td>audio codecs</td>
+            <td></td>
+        </tr>
+        <tr id="video_codecs">
+            <td>video codecs</td>
+            <td></td>
+        </tr>
+        <tr id="touch_screen">
+            <td>touch screen</td>
             <td></td>
         </tr>
         <tr id="headless_1">
@@ -97,18 +134,214 @@
     setValue('navigator_app_code_name', navigator.appCodeName);
     setValue('navigator_app_name', navigator.appName);
     setValue('navigator_app_version', navigator.appVersion);
+    setValue('navigator_languages', navigator.languages);
+    setValue('navigator_media_devices', navigator.mediaDevices);
+
+    if ('plugins' in navigator) {
+        let list = [];
+        for (let i in navigator.plugins) {
+            if (navigator.plugins[i] instanceof Plugin) {
+                list[i] = navigator.plugins[i].name;
+            }
+        }
+        setValue('navigator_plugins', list);
+    } else {
+        setValue('navigator_plugins', navigator.plugins);
+    }
+
+    function debugTool() {
+        let cpt = 0;
+        const regexp = /./;
+        regexp.toString = () => {
+            cpt++;
+            return 'spooky';
+        };
+        console.debug(regexp);
+        return cpt > 1;
+    }
+
+
+    setValue('debug_tool', debugTool());
+    setValue('window_chrome', window.chrome);
+    setValue('audio_codecs', audioCodecs());
+    setValue('video_codecs', videoCodecs());
+    setValue('touch_screen', touchScreen());
 
     function setValue(id, value) {
         let el = document.getElementById(id);
+        el.childNodes[3].textContent = my_dump(value);
         if (value === undefined) {
-            el.childNodes[3].textContent = 'not defined';
             el.classList.add('error');
-        } else {
-            el.childNodes[3].textContent = value;
-            if (!value) {
-                el.classList.add('warning');
-            }
+        } else if (!value) {
+            el.classList.add('warning');
         }
+    }
+
+    function audioCodecs() {
+        const audioElt = document.createElement("audio");
+
+        if (audioElt.canPlayType) {
+            return [
+                'ogg: ' + (audioElt.canPlayType('audio/ogg; codecs="vorbis"') ? 'true' : 'false'),
+                'mp3: ' + (audioElt.canPlayType('audio/mpeg;') ? 'true' : 'false'),
+                'wav: ' + (audioElt.canPlayType('audio/wav; codecs="1"') ? 'true' : 'false'),
+                'm4a: ' + (audioElt.canPlayType('audio/x-m4a;') ? 'true' : 'false'),
+                'aac: ' + (audioElt.canPlayType('audio/aac;') ? 'true' : 'false'),
+            ];
+        }
+        return [];
+    }
+
+    function videoCodecs()  {
+        const videoElt = document.createElement("video");
+
+        if (videoElt.canPlayType) {
+            return [
+                'ogg: ' + (videoElt.canPlayType('video/ogg; codecs="theora"') ? 'true' : 'false'),
+                'h264: ' + (videoElt.canPlayType('video/mp4; codecs="avc1.42E01E"') ? 'true' : 'false'),
+                'webm: ' + (videoElt.canPlayType('video/webm; codecs="vp8, vorbis"') ? 'true' : 'false'),
+            ]
+        }
+        return [];
+    }
+
+    function touchScreen() {
+        let maxTouchPoints = 0;
+        let touchEvent = false;
+        if (typeof navigator.maxTouchPoints !== "undefined") {
+            maxTouchPoints = navigator.maxTouchPoints;
+        } else if (typeof navigator.msMaxTouchPoints !== "undefined") {
+            maxTouchPoints = navigator.msMaxTouchPoints;
+        }
+        try {
+            document.createEvent("TouchEvent");
+            touchEvent = true;
+        } catch (_) {
+        }
+
+        const touchStart = "ontouchstart" in window;
+        return [
+            'maxTouchPoints:' + maxTouchPoints,
+            'touchEvent:' + (touchEvent ? 'YES' : 'NO'),
+            'touchStart:' + (touchStart ? 'YES' : 'NO')
+        ];
+    }
+
+    function my_dump (var_value, var_name)
+    {
+        // Check for a third argument and if one exists, capture it's value, else
+        // default to TRUE.  When the third argument is true, this function
+        // publishes the result to the document body, else, it outputs a string.
+        // The third argument is intend for use by recursive calls within this
+        // function, but there is no reason why it couldn't be used in other ways.
+        var is_publish_to_body = typeof arguments[2] === 'undefined' ? true:arguments[2];
+
+        // Check for a fourth argument and if one exists, add three to it and
+        // use it to indent the out block by that many characters.  This argument is
+        // not intended to be used by any other than the recursive call.
+        var indent_by = typeof arguments[3] === 'undefined' ? 0:arguments[3]+3;
+
+        var do_boolean = function (v)
+        {
+            return 'Boolean(1) '+(v?'TRUE':'FALSE');
+        };
+
+        var do_number = function(v)
+        {
+            var num_digits = (''+v).length;
+            return 'Number('+num_digits+') '+v;
+        };
+
+        var do_string = function(v)
+        {
+            var num_chars = v.length;
+            return 'String('+num_chars+') "'+v+'"';
+        };
+
+        var do_object = function(v)
+        {
+            if (v === null)
+            {
+                return "NULL(0)";
+            }
+
+            var out = '';
+            var num_elem = 0;
+            var indent = '';
+
+            if (v instanceof Array)
+            {
+                num_elem = v.length;
+                for (var d=0; d<indent_by; ++d)
+                {
+                    indent += ' ';
+                }
+                out = "Array("+num_elem+") \n"+(indent.length === 0?'':'|'+indent+'')+"(";
+                for (var i=0; i<num_elem; ++i)
+                {
+                    out += "\n"+(indent.length === 0?'':'|'+indent)+"|   ["+i+"] = "+my_dump(v[i],'',false,indent_by);
+                }
+                out += "\n"+(indent.length === 0?'':'|'+indent+'')+")";
+                return out;
+            }
+            else if (v instanceof Object)
+            {
+                for (var d=0; d<indent_by; ++d)
+                {
+                    indent += ' ';
+                }
+                out = "Object ("+(Object.keys(v).length)+')';
+                // out = "Object \n"+(indent.length === 0?'':'|'+indent+'')+"(";
+                // for (var p in v)
+                // {
+                //     out += "\n"+(indent.length === 0?'':'|'+indent)+"|   ["+p+"] = "+my_dump(v[p],'',false,indent_by);
+                // }
+                // out += "\n"+(indent.length === 0?'':'|'+indent+'')+")";
+                return out;
+            }
+            else
+            {
+                return 'Unknown Object Type!';
+            }
+        };
+
+        // Makes it easier, later on, to switch behaviors based on existance or
+        // absence of a var_name parameter.  By converting 'undefined' to 'empty
+        // string', the length greater than zero test can be applied in all cases.
+        var_name = typeof var_name === 'undefined' ? '':var_name;
+        var out = '';
+        var v_name = '';
+        switch (typeof var_value)
+        {
+            case "boolean":
+                v_name = var_name.length > 0 ? var_name + ' = ':''; // Turns labeling on if var_name present, else no label
+                out += v_name + do_boolean(var_value);
+                break;
+            case "number":
+                v_name = var_name.length > 0 ? var_name + ' = ':'';
+                out += v_name + do_number(var_value);
+                break;
+            case "string":
+                v_name = var_name.length > 0 ? var_name + ' = ':'';
+                out += v_name + do_string(var_value);
+                break;
+            case "object":
+                v_name = var_name.length > 0 ? var_name + ' => ':'';
+                out += v_name + do_object(var_value);
+                break;
+            case "function":
+                v_name = var_name.length > 0 ? var_name + ' = ':'';
+                out += v_name + "Function";
+                break;
+            case "undefined":
+                v_name = var_name.length > 0 ? var_name + ' = ':'';
+                out += v_name + "Undefined";
+                break;
+            default:
+                out += v_name + ' is unknown type!';
+        }
+
+        return out;
     }
 </script>
 </body>
