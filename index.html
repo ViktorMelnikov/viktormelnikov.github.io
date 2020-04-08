@@ -2,69 +2,114 @@
 <html>
 <head>
     <title>Test</title>
+    <style>
+        table tr td{
+            padding: 1px 5px;
+        }
+        table tr td:first-child {
+            background-color: #e6e6e6;
+        }
+        .error {
+            background: #fc4635;
+        }
+        .warning {
+            background: #fcc95e;
+        }
+    </style>
 </head>
 <body>
-<p>
-    <b>eval length - </b> <span id="eval_length"></span>
-</p>
-<p>
-    <b>Chrome headless by navigator.permissions.query - </b> <span id="headless_1"></span>
-</p>
-<p>
-    <b>navigator.platform - </b> <span id="navigator_platform"></span>
-</p>
-<p>
-    <b>navigator.webdriver - </b> <span id="navigator_webdriver"></span>
-</p>
-<p>
-    <b>navigator.vendor - </b> <span id="navigator_vendor"></span>
-</p>
-<p>
-    <b>navigator.product - </b> <span id="navigator_product"></span>
-</p>
-<p>
-    <b>navigator.deviceMemory - </b> <span id="navigator_device_memory"></span>
-</p>
-<p>
-    <b>navigator.appCodeName - </b> <span id="navigator_app_code_name"></span>
-</p>
-<p>
-    <b>navigator.appName - </b> <span id="navigator_app_name"></span>
-</p>
-<p>
-    <b>navigator.appVersion - </b> <span id="navigator_app_version"></span>
-</p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Status</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="navigator_platform">
+            <td>navigator -> platform</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_webdriver">
+            <td>navigator -> webdriver</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_vendor">
+            <td>navigator -> vendor</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_product">
+            <td>navigator -> product</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_device_memory">
+            <td>navigator -> deviceMemory</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_app_code_name">
+            <td>navigator -> appCodeName</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_app_name">
+            <td>navigator -> appName</td>
+            <td></td>
+        </tr>
+        <tr id="navigator_app_version">
+            <td>navigator -> appVersion</td>
+            <td></td>
+        </tr>
+        <tr id="eval_length">
+            <td>eval length</td>
+            <td></td>
+        </tr>
+        <tr id="headless_1">
+            <td>Chrome headless by navigator -> permissions.query</td>
+            <td></td>
+        </tr>
+
+    </tbody>
+</table>
 
 <script type="text/javascript">
-    document.getElementById('eval_length').textContent = eval.toString().length;
-
     //----------------------//
     if (navigator.permissions) {
         navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
                 if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
-                    document.getElementById('headless_1').textContent = 'yes';
+                    setValue('headless_1', 'yes');
                 } else {
-                    document.getElementById('headless_1').textContent = 'no';
+                    setValue('headless_1', 'no');
                 }
             }
         );
     } else {
-        document.getElementById('headless_1').textContent = 'navigator.permissions not defined';
+        setValue('headless_1', 'navigator.permissions not defined');
     }
 
 
     //-----------------------//
-    document.getElementById('navigator_platform').textContent = 'platform' in navigator ? navigator.platform : 'not definded';
-    document.getElementById('navigator_webdriver').textContent = 'webdriver' in navigator ? navigator.webdriver : 'not definded';
-    document.getElementById('navigator_vendor').textContent = 'vendor' in navigator ? navigator.vendor : 'not definded';
-    document.getElementById('navigator_product').textContent = 'product' in navigator ? navigator.product : 'not definded';
-    document.getElementById('navigator_device_memory').textContent = 'deviceMemory' in navigator ? navigator.deviceMemory : 'not definded';
+    setValue('eval_length', eval.toString().length);
+    setValue('navigator_platform', navigator.platform);
+    setValue('navigator_webdriver', navigator.webdriver);
+    setValue('navigator_vendor', navigator.vendor);
+    setValue('navigator_product', navigator.product);
+    setValue('navigator_device_memory', navigator.deviceMemory);
+    setValue('navigator_app_code_name', navigator.appCodeName);
+    setValue('navigator_app_name', navigator.appName);
+    setValue('navigator_app_version', navigator.appVersion);
 
-
-    document.getElementById('navigator_app_code_name').textContent = 'appCodeName' in navigator ? navigator.appCodeName : 'not definded';
-    document.getElementById('navigator_app_name').textContent = 'appName' in navigator ? navigator.appName : 'not definded';
-    document.getElementById('navigator_app_version').textContent = 'appVersion' in navigator ? navigator.appVersion : 'not definded';
-
+    function setValue(id, value) {
+        let el = document.getElementById(id);
+        if (value === undefined) {
+            el.childNodes[3].textContent = 'not defined';
+            el.classList.add('error');
+        } else {
+            el.childNodes[3].textContent = value;
+            if (!value) {
+                el.classList.add('warning');
+            }
+        }
+    }
 </script>
 </body>
 </html>
