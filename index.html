@@ -41,11 +41,12 @@
 	//----------------------//
 	if (navigator.permissions) {
 		navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
-	    if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
-	        document.getElementById('headless_1').textContent = 'yes';	
-	    } else {
-	        document.getElementById('headless_1').textContent = 'no';	
-	    }
+		    if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
+		        document.getElementById('headless_1').textContent = 'yes';	
+		    } else {
+		        document.getElementById('headless_1').textContent = 'no';	
+		    }
+	    );
 	} else {
 		document.getElementById('headless_1').textContent = 'navigator.permissions not defined';	
 	}
