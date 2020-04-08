@@ -20,25 +20,48 @@
 	<b>navigator.vendor - </b> <span id="navigator_vendor"></span>
 </p>
 <p>
+	<b>navigator.product - </b> <span id="navigator_product"></span>
+</p>
+<p>
 	<b>navigator.deviceMemory - </b> <span id="navigator_device_memory"></span>
+</p>
+<p>
+	<b>navigator.appCodeName - </b> <span id="navigator_app_code_name"></span>
+</p>
+<p>
+	<b>navigator.appName - </b> <span id="navigator_app_name"></span>
+</p>
+<p>
+	<b>navigator.appVersion - </b> <span id="navigator_app_version"></span>
 </p>
 
 <script type="text/javascript">
 	document.getElementById('eval_length').textContent = eval.toString().length;
 
 	//----------------------//
-	navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
-    if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
-        document.getElementById('headless_1').textContent = 'yes';	
-    } else {
-        document.getElementById('headless_1').textContent = 'no';	
-    }
+	if (navigator.permissions) {
+		navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
+	    if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
+	        document.getElementById('headless_1').textContent = 'yes';	
+	    } else {
+	        document.getElementById('headless_1').textContent = 'no';	
+	    }
+	} else {
+		document.getElementById('headless_1').textContent = 'navigator.permissions not defined';	
+	}
+	
 
     //-----------------------//
     document.getElementById('navigator_platform').textContent = navigator.platform;	
     document.getElementById('navigator_webdriver').textContent = navigator.webdriver;	
     document.getElementById('navigator_vendor').textContent = navigator.vendor;	
+    document.getElementById('navigator_product').textContent = navigator.product;	
     document.getElementById('navigator_device_memory').textContent = navigator.deviceMemory;	
+
+
+    document.getElementById('navigator_app_code_name').textContent = navigator.appCodeName;	
+    document.getElementById('navigator_app_name').textContent = navigator.appName;	
+    document.getElementById('navigator_app_version').textContent = navigator.appVersion;	
 });
 </script>
 </body>
