@@ -10,6 +10,18 @@
 <p>
 	<b>Chrome headless by navigator.permissions.query - </b> <span id="headless_1"></span>
 </p>
+<p>
+	<b>navigator.platform - </b> <span id="navigator_platform"></span>
+</p>
+<p>
+	<b>navigator.webdriver - </b> <span id="navigator_webdriver"></span>
+</p>
+<p>
+	<b>navigator.vendor - </b> <span id="navigator_vendor"></span>
+</p>
+<p>
+	<b>navigator.deviceMemory - </b> <span id="navigator_device_memory"></span>
+</p>
 
 <script type="text/javascript">
 	document.getElementById('eval_length').textContent = eval.toString().length;
@@ -21,6 +33,12 @@
     } else {
         document.getElementById('headless_1').textContent = 'no';	
     }
+
+    //-----------------------//
+    document.getElementById('navigator_platform').textContent = navigator.platform;	
+    document.getElementById('navigator_webdriver').textContent = navigator.webdriver;	
+    document.getElementById('navigator_vendor').textContent = navigator.vendor;	
+    document.getElementById('navigator_device_memory').textContent = navigator.deviceMemory;	
 });
 </script>
 </body>
