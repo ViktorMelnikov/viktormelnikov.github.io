@@ -68,6 +68,10 @@
             <td>navigator -> plugins</td>
             <td></td>
         </tr>
+        <tr id="navigator_plugins_exists">
+            <td>navigator -> plugins exists</td>
+            <td></td>
+        </tr>
         <tr id="navigator_languages">
             <td>navigator -> languages</td>
             <td></td>
@@ -148,6 +152,9 @@
     } else {
         setValue('navigator_plugins', navigator.plugins);
     }
+
+    setValue('navigator_plugins_exists', navigator.plugins);
+
 
     function debugTool() {
         let cpt = 0;
