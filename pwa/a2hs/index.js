@@ -52,6 +52,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   });
   
   setTimeout(function(){
+    console.info("navigator.userActivation.isActive", navigator.userActivation.isActive);
     if (navigator.userActivation.isActive) { deferredPrompt.prompt(); }
   }, 2000);
 });
