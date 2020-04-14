@@ -88,6 +88,14 @@
             <td>window.chrome</td>
             <td></td>
         </tr>
+        <tr id="window_onbeforeinstallprompt">
+            <td>window.onbeforeinstallprompt</td>
+            <td></td>
+        </tr>
+        <tr id="window_onappinstalled">
+            <td>window.onappinstalled</td>
+            <td></td>
+        </tr>
         <tr id="debug_tool">
             <td>debug tool</td>
             <td></td>
@@ -173,6 +181,8 @@
     setValue('audio_codecs', audioCodecs());
     setValue('video_codecs', videoCodecs());
     setValue('touch_screen', touchScreen());
+    setValue('window_onbeforeinstallprompt', window.onbeforeinstallprompt)
+    setValue('window_onappinstalled', window.onappinstalled)
 
     function setValue(id, value) {
         let el = document.getElementById(id);
