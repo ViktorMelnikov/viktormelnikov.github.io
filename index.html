@@ -96,6 +96,14 @@
             <td>window.onappinstalled</td>
             <td></td>
         </tr>
+        <tr id="window_notification">
+            <td>window.Notification</td>
+            <td></td>
+        </tr>
+        <tr id="window_push_manager">
+            <td>window.PushManager</td>
+            <td></td>
+        </tr>
         <tr id="debug_tool">
             <td>debug tool</td>
             <td></td>
@@ -178,6 +186,8 @@
 
     setValue('debug_tool', debugTool());
     setValue('window_chrome', window.chrome);
+    setValue('window_notification', window.Notification);
+    setValue('window_push_manager', window.PushManager);
     setValue('audio_codecs', audioCodecs());
     setValue('video_codecs', videoCodecs());
     setValue('touch_screen', touchScreen());
