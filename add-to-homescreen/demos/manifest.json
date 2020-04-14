@@ -1,74 +1,25 @@
 {
-    "name": "Love2Dev",
-    "short_name": "Love2Dev",
-    "icons": [ {
-            "src": "meta/love2dev-64x64.gif",
-            "sizes": "64x64",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-70x70.png",
-            "sizes": "70x70",
-            "type": "image/png"
-        },
-        {
-            "src": "meta/love2dev-120x120.gif",
-            "sizes": "120x120",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-144x144.png",
-            "sizes": "144x144",
-            "type": "image/png"
-        },
-        {
-            "src": "meta/love2dev-150x150.gif",
-            "sizes": "150x150",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-152x152.gif",
-            "sizes": "152x152",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "meta/love2dev-310x174.gif",
-            "sizes": "310x174",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-310x310.gif",
-            "sizes": "310x310",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-icon-340x340.gif",
-            "sizes": "340x340",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-310x310.png",
-            "sizes": "310x310",
-            "type": "image/png"
-        },
-        {
-            "src": "meta/love2dev-600x310.gif",
-            "sizes": "600x310",
-            "type": "image/gif"
-        },
-        {
-            "src": "meta/love2dev-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ],
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#7E040E",
-    "theme_color": "#DFD6D9"
+  "name": "Love2Dev",
+  "short_name": "Love2Dev",
+  "icons": [
+    {
+      "src": "meta/love2dev-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "meta/love2dev-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "meta/love2dev-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7E040E",
+  "theme_color": "#DFD6D9"
 }
