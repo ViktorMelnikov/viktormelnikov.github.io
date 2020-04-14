@@ -18,7 +18,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/",
+  "start_url": "/add-to-homescreen/demos/",
   "display": "standalone",
   "background_color": "#7E040E",
   "theme_color": "#DFD6D9"
