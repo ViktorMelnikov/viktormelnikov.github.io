@@ -1,0 +1,34 @@
+{
+  "name": "add-to-homescreen",
+  "version": "1.0.0",
+  "description": "Manage the Progressive Web Application 'installation' Prompt across platforms.",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server demos/ -p 9001 -c -i",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/docluv/add-to-homescreen.git"
+  },
+  "keywords": [
+    "PWA",
+    "Progressive",
+    "Web",
+    "App",
+    "Add",
+    "to",
+    "Homescreen"
+  ],
+  "author": "Chris Love",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/docluv/add-to-homescreen/issues"
+  },
+  "homepage": "https://github.com/docluv/add-to-homescreen#readme",
+  "dependencies": {
+    "http-server": "^0.11.1",
+    "uglify": "*",
+    "uglify-es": "*"
+  }
+}
