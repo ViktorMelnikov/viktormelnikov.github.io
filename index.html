@@ -141,6 +141,10 @@
             <td>Diff between outerHeight and innerHeight</td>
             <td></td>
         </tr>
+        <tr id="screen_color_depth">
+            <td>Screen -> colorDepth</td>
+            <td></td>
+        </tr>
 
     </tbody>
 </table>
@@ -174,6 +178,7 @@
     setValue('navigator_languages', navigator, 'languages');
     setValue('navigator_media_devices', navigator, 'mediaDevices');
     setValue('height_diff', window.outerHeight-window.innerHeight);
+    setValue('screen_color_depth', screen.colorDepth);
 
     if ('plugins' in navigator) {
         let list = [];
