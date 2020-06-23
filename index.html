@@ -125,6 +125,19 @@
             <td></td>
         </tr>
 
+        <tr id="iframe_with_chrome">
+            <td>Chrome in created IFRAME</td>
+            <td></td>
+        </tr>
+        <tr id="install_trigger">
+            <td>Check available InstallTrigger</td>
+            <td></td>
+        </tr>
+        <tr id="function_to_string_in_log">
+            <td>Function to string in log</td>
+            <td></td>
+        </tr>
+
     </tbody>
 </table>
 
@@ -193,6 +206,28 @@
     setValue('touch_screen', touchScreen());
     setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt')
     setValue('window_onappinstalled', window, 'onappinstalled')
+
+    setValue('install_trigger', typeof InstallTrigger);
+    setValue('function_to_string_in_log', function () {
+        var a = 0,
+            b = function () {};
+        b.toString =
+            function () {
+                ++a;
+                return ""
+            };
+        console.log(b);
+        return a
+    }());
+
+    setValue('iframe_with_chrome', function () {
+        var a = document.createElement("iframe");
+        a.srcdoc = "srcdoc";
+        document.body.appendChild(a);
+        var b = typeof a.contentWindow.chrome;
+        a.remove();
+        return b
+    }());
 
     function setValue(id) {
         let value;
