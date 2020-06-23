@@ -137,6 +137,10 @@
             <td>Function to string in log</td>
             <td></td>
         </tr>
+        <tr id="height_diff">
+            <td>Diff between outerHeight and innerHeight</td>
+            <td></td>
+        </tr>
 
     </tbody>
 </table>
@@ -169,6 +173,7 @@
     setValue('navigator_app_version', navigator, 'appVersion');
     setValue('navigator_languages', navigator, 'languages');
     setValue('navigator_media_devices', navigator, 'mediaDevices');
+    setValue('height_diff', window.outerHeight-window.innerHeight);
 
     if ('plugins' in navigator) {
         let list = [];
