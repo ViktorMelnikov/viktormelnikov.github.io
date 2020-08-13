@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detect C1</title>
+</head>
+<body>
+</body>
+<table id="data">
+
+</table>
+<script type="application/javascript">
+    var q = ["__stopAllTimers", "webdriver", "__nightmare", "_selenium", "callPhantom", "callSelenium", "_Selenium_IDE_Recorder", "selenium", "driver", "_selenium", "__webdriver_evaluate", "__selenium_evaluate", "__webdriver_script_function", "__webdriver_script_func", "__webdriver_script_fn", "__fxdriver_evaluate", "__driver_unwrapped", "__webdriver_unwrapped", "__driver_evaluate", "__selenium_unwrapped", "__fxdriver_unwrapped", "_phantom", "phantom", "domAutomation__nightmare"],
+        e = encodeURIComponent, g = 0, w = window, d = w.document, n = w.navigator, de = "documentElement",
+        s = w.screen, p = "", a = "avail", i = "inner", o = "outer", H = "Height", W = "Width",
+        c = w.chrome ? Object.keys(w.chrome).join("*") : "*", tag = d.createElement("script");
+
+    function wd() {
+        try {
+            for (var l in q) {
+                var z = q[l];
+                if (w[z] || n[z]) return z;
+                if (d && d[de] && d[de].getAttribute && d[de].getAttribute(z)) return z;
+                if (z in w || z in d) return z
+            }
+            return 0
+        } catch (e) {
+        }
+    }
+
+    !function wp() {
+        try {
+            if (n && n.plugins) {
+                Object.keys(n.plugins).forEach(function (i) {
+                    if (n.plugins[i]) p += n.plugins[i].filename + "*"
+                })
+            }
+        } catch (e) {
+        }
+    }();
+    try {
+        g = d.createElement("canvas").getContext("webgl");
+        g = g.getParameter(g.getExtension("WEBGL_debug_renderer_info").UNMASKED_RENDERER_WEBGL)
+    } catch (e) {
+    }
+
+
+    const tableData = document.getElementById('data');
+    tableData.innerHTML += `<tr><td>Drive</td><td>${wd()}</td></tr>`;
+    tableData.innerHTML += `<tr><td>Chrome</td><td>${c}</td></tr>`;
+    tableData.innerHTML += `<tr><td>Screen params:</td><td></td></tr>`;
+    tableData.innerHTML += `<tr><td> - screen.availHeight</td><td>${s[a + H]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - window.innerHeight</td><td>${w[i + H]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - window.outerHeight</td><td>${w[o + H]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - screen.availWidth</td><td>${s[a + W]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - window.innerWidth</td><td>${w[i + W]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - window.outerWidth</td><td>${w[o + W]}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - window.devicePixelRatio</td><td>${w.devicePixelRatio}</td></tr>`;
+    tableData.innerHTML += `<tr><td> - navigator.maxTouchPoints</td><td>${n.maxTouchPoints}</td></tr>`;
+    tableData.innerHTML += `<tr><td>P</td><td>${p}</td></tr>`;
+    tableData.innerHTML += `<tr><td>navigator.hardwareConcurrency</td><td>${n.hardwareConcurrency}</td></tr>`;
+    tableData.innerHTML += `<tr><td>navigator.deviceMemory</td><td>${n.deviceMemory}</td></tr>`;
+    tableData.innerHTML += `<tr><td>WebGL</td><td>${g}</td></tr>`;
+    tableData.innerHTML += `<tr><td>Time</td><td>${new Date().toString()}</td></tr>`;
+    tableData.innerHTML += `<tr><td>Q</td><td>${w.location.search.substr(1)}</td></tr>`;
+
+</script>
+</html>
