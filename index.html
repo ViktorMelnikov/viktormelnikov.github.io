@@ -52,6 +52,10 @@
             <td>navigator -> deviceMemory</td>
             <td></td>
         </tr>
+        <tr id="navigator_hardware_concurrency">
+            <td>navigator -> hardwareConcurrency</td>
+            <td></td>
+        </tr>
         <tr id="navigator_app_code_name">
             <td>navigator -> appCodeName</td>
             <td></td>
@@ -145,7 +149,43 @@
             <td>Screen -> colorDepth</td>
             <td></td>
         </tr>
-
+        <tr id="window_device_pixel_ratio">
+            <td>window -> devicePixelRatio</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Screen -> avail* (width,height)</td>
+            <td>
+                <table>
+                    <tr>
+                        <td id="screen_avail_width"></td>
+                        <td id="screen_avail_height"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Window -> inner* (width,height)</td>
+            <td>
+                <table>
+                    <tr>
+                        <td id="window_inner_width"></td>
+                        <td id="window_inner_height"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Window -> outer* (width,height)</td>
+            <td>
+                <table>
+                    <tr>
+                        <td id="window_outer_width"></td>
+                        <td id="window_outer_height"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </tbody>
 </table>
 
@@ -172,6 +212,7 @@
     setValue('navigator_vendor', navigator, 'vendor');
     setValue('navigator_product', navigator , 'product');
     setValue('navigator_device_memory', navigator, 'deviceMemory');
+    setValue('navigator_hardware_concurrency', navigator, 'hardwareConcurrency');
     setValue('navigator_app_code_name', navigator, 'appCodeName');
     setValue('navigator_app_name', navigator, 'appName');
     setValue('navigator_app_version', navigator, 'appVersion');
@@ -214,8 +255,9 @@
     setValue('audio_codecs', audioCodecs());
     setValue('video_codecs', videoCodecs());
     setValue('touch_screen', touchScreen());
-    setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt')
-    setValue('window_onappinstalled', window, 'onappinstalled')
+    setValue('window_device_pixel_ratio', window, 'devicePixelRatio');
+    setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt');
+    setValue('window_onappinstalled', window, 'onappinstalled');
 
     setValue('install_trigger', typeof InstallTrigger);
     setValue('function_to_string_in_log', function () {
@@ -238,6 +280,15 @@
         a.remove();
         return b
     }());
+
+    document.getElementById('screen_avail_height').textContent = screen.availHeight;
+    document.getElementById('screen_avail_width').textContent = screen.availWidth;
+
+    document.getElementById('window_inner_height').textContent = window.innerHeight;
+    document.getElementById('window_inner_width').textContent = window.innerWidth;
+
+    document.getElementById('window_outer_height').textContent = window.outerHeight;
+    document.getElementById('window_outer_width').textContent = window.outerWidth;
 
     function setValue(id) {
         let value;
