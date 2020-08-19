@@ -436,7 +436,7 @@
                 {
                     indent += ' ';
                 }
-                out = "Object ("+(Object.keys(v).length)+')';
+                out = "Object ("+(Object.keys(v).length)+`) {${Object.keys(v).join(', ')}}`;
                 // out = "Object \n"+(indent.length === 0?'':'|'+indent+'')+"(";
                 // for (var p in v)
                 // {
