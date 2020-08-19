@@ -191,49 +191,96 @@
 
 <script type="text/javascript">
     //----------------------//
-    if (navigator.permissions) {
-        navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
-                if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
-                    setValue('headless_1', 'yes');
-                } else {
-                    setValue('headless_1', 'no');
+    try {
+        if (navigator.permissions) {
+            navigator.permissions.query({name:'notifications'}).then(function(permissionStatus) {
+                    if(Notification.permission === 'denied' && permissionStatus.state === 'prompt') {
+                        setValue('headless_1', 'yes');
+                    } else {
+                        setValue('headless_1', 'no');
+                    }
+                }
+            );
+        } else {
+            setValue('headless_1', 'navigator.permissions not defined');
+        }
+
+
+        //-----------------------//
+        setValue('eval_length', eval.toString().length);
+        setValue('navigator_platform', navigator, 'platform');
+        setValue('navigator_webdriver', navigator, 'webdriver');
+        setValue('navigator_vendor', navigator, 'vendor');
+        setValue('navigator_product', navigator , 'product');
+        setValue('navigator_device_memory', navigator, 'deviceMemory');
+        setValue('navigator_hardware_concurrency', navigator, 'hardwareConcurrency');
+        setValue('navigator_app_code_name', navigator, 'appCodeName');
+        setValue('navigator_app_name', navigator, 'appName');
+        setValue('navigator_app_version', navigator, 'appVersion');
+        setValue('navigator_languages', navigator, 'languages');
+        setValue('navigator_media_devices', navigator, 'mediaDevices');
+        setValue('height_diff', window.outerHeight-window.innerHeight);
+        setValue('screen_color_depth', screen.colorDepth);
+
+        if ('plugins' in navigator) {
+            let list = [];
+            for (let i in navigator.plugins) {
+                if (navigator.plugins[i] instanceof Plugin) {
+                    list[i] = navigator.plugins[i].name;
                 }
             }
-        );
-    } else {
-        setValue('headless_1', 'navigator.permissions not defined');
-    }
-
-
-    //-----------------------//
-    setValue('eval_length', eval.toString().length);
-    setValue('navigator_platform', navigator, 'platform');
-    setValue('navigator_webdriver', navigator, 'webdriver');
-    setValue('navigator_vendor', navigator, 'vendor');
-    setValue('navigator_product', navigator , 'product');
-    setValue('navigator_device_memory', navigator, 'deviceMemory');
-    setValue('navigator_hardware_concurrency', navigator, 'hardwareConcurrency');
-    setValue('navigator_app_code_name', navigator, 'appCodeName');
-    setValue('navigator_app_name', navigator, 'appName');
-    setValue('navigator_app_version', navigator, 'appVersion');
-    setValue('navigator_languages', navigator, 'languages');
-    setValue('navigator_media_devices', navigator, 'mediaDevices');
-    setValue('height_diff', window.outerHeight-window.innerHeight);
-    setValue('screen_color_depth', screen.colorDepth);
-
-    if ('plugins' in navigator) {
-        let list = [];
-        for (let i in navigator.plugins) {
-            if (navigator.plugins[i] instanceof Plugin) {
-                list[i] = navigator.plugins[i].name;
-            }
+            setValue('navigator_plugins', list);
+        } else {
+            setValue('navigator_plugins', navigator, 'plugins');
         }
-        setValue('navigator_plugins', list);
-    } else {
-        setValue('navigator_plugins', navigator, 'plugins');
-    }
 
-    setValue('navigator_plugins_exists', navigator, 'plugins');
+        setValue('navigator_plugins_exists', navigator, 'plugins');
+
+
+        setValue('debug_tool', debugTool());
+        setValue('window_chrome', window, 'chrome');
+        setValue('window_notification', window, 'Notification');
+        setValue('window_push_manager', window, 'PushManager');
+        setValue('audio_codecs', audioCodecs());
+        setValue('video_codecs', videoCodecs());
+        setValue('touch_screen', touchScreen());
+        setValue('window_device_pixel_ratio', window, 'devicePixelRatio');
+        setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt');
+        setValue('window_onappinstalled', window, 'onappinstalled');
+
+        setValue('install_trigger', typeof InstallTrigger);
+        setValue('function_to_string_in_log', function () {
+            var a = 0,
+                b = function () {};
+            b.toString =
+                function () {
+                    ++a;
+                    return ""
+                };
+            console.log(b);
+            return a
+        }());
+
+        setValue('iframe_with_chrome', function () {
+            var a = document.createElement("iframe");
+            a.srcdoc = "srcdoc";
+            document.body.appendChild(a);
+            var b = typeof a.contentWindow.chrome;
+            a.remove();
+            return b
+        }());
+
+        document.getElementById('screen_avail_height').textContent = screen.availHeight;
+        document.getElementById('screen_avail_width').textContent = screen.availWidth;
+
+        document.getElementById('window_inner_height').textContent = window.innerHeight;
+        document.getElementById('window_inner_width').textContent = window.innerWidth;
+
+        document.getElementById('window_outer_height').textContent = window.outerHeight;
+        document.getElementById('window_outer_width').textContent = window.outerWidth;
+    } catch (e) {
+        document.writeln(`<pre>${JSON.stringify(e)}</pre>`);
+    }
 
 
     function debugTool() {
@@ -246,49 +293,6 @@
         console.debug(regexp);
         return cpt > 1;
     }
-
-
-    setValue('debug_tool', debugTool());
-    setValue('window_chrome', window, 'chrome');
-    setValue('window_notification', window, 'Notification');
-    setValue('window_push_manager', window, 'PushManager');
-    setValue('audio_codecs', audioCodecs());
-    setValue('video_codecs', videoCodecs());
-    setValue('touch_screen', touchScreen());
-    setValue('window_device_pixel_ratio', window, 'devicePixelRatio');
-    setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt');
-    setValue('window_onappinstalled', window, 'onappinstalled');
-
-    setValue('install_trigger', typeof InstallTrigger);
-    setValue('function_to_string_in_log', function () {
-        var a = 0,
-            b = function () {};
-        b.toString =
-            function () {
-                ++a;
-                return ""
-            };
-        console.log(b);
-        return a
-    }());
-
-    setValue('iframe_with_chrome', function () {
-        var a = document.createElement("iframe");
-        a.srcdoc = "srcdoc";
-        document.body.appendChild(a);
-        var b = typeof a.contentWindow.chrome;
-        a.remove();
-        return b
-    }());
-
-    document.getElementById('screen_avail_height').textContent = screen.availHeight;
-    document.getElementById('screen_avail_width').textContent = screen.availWidth;
-
-    document.getElementById('window_inner_height').textContent = window.innerHeight;
-    document.getElementById('window_inner_width').textContent = window.innerWidth;
-
-    document.getElementById('window_outer_height').textContent = window.outerHeight;
-    document.getElementById('window_outer_width').textContent = window.outerWidth;
 
     function setValue(id) {
         let value;
@@ -485,6 +489,7 @@
 
         return out;
     }
+
 </script>
 </body>
 </html>
