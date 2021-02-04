@@ -84,6 +84,10 @@
             <td>navigator -> mediaDevices</td>
             <td></td>
         </tr>
+        <tr id="navigator_battery">
+            <td>navigator -> battery</td>
+            <td></td>
+        </tr>
         <tr id="eval_length">
             <td>eval length</td>
             <td></td>
@@ -233,6 +237,23 @@
         } else {
             setValue('navigator_plugins', navigator, 'plugins');
         }
+
+        if (!('getBattery' in navigator)) {
+            setValue('navigator_battery', '[NOT DEFINED]')
+        } else {
+            navigator.getBattery().then(function(battery) {
+                let res = [];
+                for (var i in battery) {
+                    let val = battery[i];
+                    if (typeof val == 'function') {
+                        val = 'function()';
+                    }
+                    res.push(i + ':' + val);
+                }
+                setValue('navigator_battery', res.join(', '));
+            });
+        }
+
 
         setValue('navigator_plugins_exists', navigator, 'plugins');
 
