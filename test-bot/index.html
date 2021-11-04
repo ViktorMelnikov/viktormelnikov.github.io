@@ -7,10 +7,18 @@
 <body>
 <a href="https://reg.adcapt.com/?s=test-tab" id="down-load" target="_blank">Download</a>
 <script>
-    //setTimeout(() => {
-    // document.getElementById('down-load').click()
-    window.open('https://reg.adcapt.com/?s=test-tab')
-    //}, 2000);
+    setTimeout(() => {
+        switch (location.hash) {
+            case 'click':
+                document.getElementById('down-load').click();
+                break;
+            case 'open':
+                window.open('https://reg.adcapt.com/?s=test-tab');
+                break;
+            default:
+                alert('Unknown action');
+        }
+    }, 200);
 </script>
 </body>
 </html>
