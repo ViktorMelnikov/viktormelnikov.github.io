@@ -96,6 +96,10 @@
             <td>window.chrome</td>
             <td></td>
         </tr>
+        <tr id="incognito">
+            <td>Incognito mode</td>
+            <td></td>
+        </tr>
         <tr id="window_onbeforeinstallprompt">
             <td>window.onbeforeinstallprompt</td>
             <td></td>
@@ -269,6 +273,15 @@
         setValue('window_onbeforeinstallprompt', window, 'onbeforeinstallprompt');
         setValue('window_onappinstalled', window, 'onappinstalled');
 
+        setValue('incognito', function() {
+            try{
+                var ls = localStorage;
+                return 'NO';
+            }
+            catch(e) {
+                return 'YES';
+            }
+        })
         setValue('install_trigger', typeof InstallTrigger);
         setValue('function_to_string_in_log', function () {
             var a = 0,
