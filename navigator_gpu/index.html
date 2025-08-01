@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGPU Navigator Dump</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .dump-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .dump-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .dump-title {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .copy-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background: #218838;
+        }
+        .copy-button:active {
+            background: #1e7e34;
+        }
+        .copy-button.copied {
+            background: #6c757d;
+        }
+        .dump-content {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #c53030;
+        }
+        .success {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #2f855a;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebGPU Navigator Dump</h1>
+        
+        <div class="controls">
+            <button onclick="dumpNavigatorGPU()">Dump navigator.gpu</button>
+            <button onclick="clearDumps()">Clear All</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let currentAdapter = null;
+
+        function createDumpSection(title, content, type = 'info') {
+            const section = document.createElement('div');
+            section.className = 'dump-section';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'dump-header';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'dump-title';
+            titleDiv.textContent = title;
+            
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-button';
+            copyButton.textContent = 'Copy JSON';
+            copyButton.onclick = () => copyToClipboard(content, copyButton);
+            
+            headerDiv.appendChild(titleDiv);
+            headerDiv.appendChild(copyButton);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'dump-content';
+            contentDiv.textContent = content;
+            
+            section.appendChild(headerDiv);
+            section.appendChild(contentDiv);
+            
+            return section;
+        }
+
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                // Visual feedback
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Visual feedback
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }
+        }
+
+        function createErrorSection(message) {
+            const section = document.createElement('div');
+            section.className = 'error';
+            section.textContent = message;
+            return section;
+        }
+
+        function createSuccessSection(message) {
+            const section = document.createElement('div');
+            section.className = 'success';
+            section.textContent = message;
+            return section;
+        }
+
+        function clearDumps() {
+            document.getElementById('output').innerHTML = '';
+            currentAdapter = null;
+        }
+
+        async function dumpNavigatorGPU() {
+            const output = document.getElementById('output');
+            
+            try {
+                // Check if WebGPU is available
+                if (!navigator.gpu) {
+                    output.appendChild(createErrorSection('WebGPU is not available in this browser'));
+                    return;
+                }
+
+                output.appendChild(createSuccessSection('WebGPU is available! Starting dump...'));
+
+                // Basic navigator.gpu dump
+                const gpuInfo = {
+                    available: !!navigator.gpu,
+                    requestAdapter: typeof navigator.gpu.requestAdapter,
+                    timestamp: new Date().toISOString()
+                };
+
+                output.appendChild(createDumpSection('Basic navigator.gpu Info', JSON.stringify(gpuInfo, null, 2)));
+
+                // Request adapter with different options
+                const adapterOptions = [
+                    {},
+                    { powerPreference: 'low-power' },
+                    { powerPreference: 'high-performance' },
+                    { forceFallback: false },
+                    { forceFallback: true }
+                ];
+
+                for (let i = 0; i < adapterOptions.length; i++) {
+                    const options = adapterOptions[i];
+                    const optionsStr = JSON.stringify(options);
+                    
+                    try {
+                        const adapter = await navigator.gpu.requestAdapter(options);
+                        
+                        if (adapter) {
+                            // Extract only the main GPUAdapter properties
+                            const adapterDump = {
+                                options: optionsStr,
+                                features: Array.from(adapter.features),
+                                limits: {},
+                                info: {},
+                                isFallbackAdapter: adapter.isFallbackAdapter,
+                                timestamp: new Date().toISOString()
+                            };
+
+                            const limistDescriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(adapter.limits));
+                            const limistProperties = Object.keys(limistDescriptors);
+                            for (const property of limistProperties) {
+                                adapterDump.limits[property] = adapter.limits[property];
+                            }
+
+                            const infoDescriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(adapter.info));
+                            const infoProperties = Object.keys(infoDescriptors);
+                            for (const property of infoProperties) {
+                                adapterDump.info[property] = adapter.info[property];
+                            }
+
+                            output.appendChild(createDumpSection(
+                                `Adapter Request (${optionsStr})`, 
+                                JSON.stringify(adapterDump, null, 2)
+                            ));
+
+                            // Store the first successful adapter
+                            if (!currentAdapter) {
+                                currentAdapter = adapter;
+                            }
+                        } else {
+                            output.appendChild(createDumpSection(
+                                `Adapter Request (${optionsStr})`, 
+                                'No adapter available for these options'
+                            ));
+                        }
+                    } catch (error) {
+                        output.appendChild(createDumpSection(
+                            `Adapter Request Error (${optionsStr})`, 
+                            `Error: ${error.message}\nStack: ${error.stack}`
+                        ));
+                    }
+                }
+
+            } catch (error) {
+                output.appendChild(createErrorSection(`Error during navigator.gpu dump: ${error.message}`));
+            }
+        }
+
+        // Auto-run basic dump on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                dumpNavigatorGPU();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 
