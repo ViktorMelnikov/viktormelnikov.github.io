@@ -329,7 +329,7 @@
             return cell(code);
         }
 
-        function signalList(values) {
+        function signalList(values, counts) {
             if (!values.length) {
                 const span = document.createElement("span");
                 span.className = "empty";
@@ -343,7 +343,7 @@
             for (const value of values) {
                 const span = document.createElement("span");
                 span.className = "signal";
-                span.textContent = value;
+                span.textContent = counts && counts[value] ? value + " x" + counts[value] : value;
                 wrap.appendChild(span);
             }
 
@@ -374,7 +374,7 @@
                 tr.appendChild(codeCell(row.signature));
                 tr.appendChild(cell(statusPill(row.status)));
                 tr.appendChild(cell(signalList(row.expectedSignals)));
-                tr.appendChild(cell(signalList(row.hitSignals)));
+                tr.appendChild(cell(signalList(row.hitSignals, row.signalCounts)));
                 tr.appendChild(cell(row.hitCount));
                 tr.appendChild(cell(row.errors.length ? row.errors.map((item) => item.message).join("; ") : "-"));
 

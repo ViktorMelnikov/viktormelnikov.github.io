@@ -62,6 +62,13 @@
         }, {});
     }
 
+    function countBy(values) {
+        return values.reduce((acc, value) => {
+            acc[value] = (acc[value] || 0) + 1;
+            return acc;
+        }, {});
+    }
+
     function unique(values) {
         return [...new Set(values)];
     }
@@ -269,6 +276,7 @@
             const errors = state.errors.filter((error) => error.testId === test.id);
             const call = state.calls.find((item) => item.testId === test.id);
             const hitSignals = unique(hits.map((hit) => hit.signal));
+            const signalCounts = countBy(hits.map((hit) => hit.signal));
             const skipped = call ? call.skipped : true;
             const detected = hits.length > 0;
             let status = "not-detected";
@@ -295,6 +303,7 @@
                 skipped,
                 expectedSignals: test.expectedSignals.slice(),
                 hitSignals,
+                signalCounts,
                 hitCount: hits.length,
                 hits,
                 errors
@@ -312,7 +321,11 @@
 
         for (const row of result.report) {
             const expected = row.expectedSignals.join(", ");
-            const actual = row.hitSignals.length ? row.hitSignals.join(", ") : "-";
+            const actual = row.hitSignals.length
+                ? row.hitSignals
+                    .map((signal) => signal + " x" + row.signalCounts[signal])
+                    .join(", ")
+                : "-";
 
             lines.push(
                 row.group +
@@ -351,7 +364,11 @@
             call: row.signature,
             status: row.status,
             expected: row.expectedSignals.join(", "),
-            actual: row.hitSignals.length ? row.hitSignals.join(", ") : "-",
+            actual: row.hitSignals.length
+                ? row.hitSignals
+                    .map((signal) => signal + " x" + row.signalCounts[signal])
+                    .join(", ")
+                : "-",
             hits: row.hitCount
         }));
 
