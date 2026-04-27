@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Console Probe Frame</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --fg: #626b77;
+            --line: #d8dee7;
+            --panel: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fg: #9aa4b2;
+                --line: #30363d;
+                --panel: #161b22;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 16px;
+            color: var(--fg);
+            background: var(--panel);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        strong {
+            display: block;
+            margin-bottom: 4px;
+            color: inherit;
+            font-weight: 650;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<strong>Iframe probe target</strong>
+<span>Console calls are emitted from this frame context.</span>
+<br>
+<code>console-probe-frame.html</code>
+
+<script src="./index.js"></script>
+<script>
+    (function () {
+        "use strict";
+
+        window.__consoleProbeFrameReady = true;
+
+        async function runAndPostResult() {
+            try {
+                const result = await window.runConsoleProbeTests({});
+
+                window.parent.postMessage(
+                    {
+                        type: "console-probe-result",
+                        result
+                    },
+                    "*"
+                );
+            } catch (error) {
+                window.parent.postMessage(
+                    {
+                        type: "console-probe-result",
+                        error: error && error.stack ? error.stack : String(error)
+                    },
+                    "*"
+                );
+            }
+        }
+
+        window.parent.postMessage({ type: "console-probe-frame-ready" }, "*");
+        runAndPostResult();
+    })();
+</script>
+</body>
+</html>
