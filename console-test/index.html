@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Console Probe Report</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #f7f8fa;
+            --fg: #1f2328;
+            --muted: #626b77;
+            --line: #d8dee7;
+            --panel: #ffffff;
+            --ok: #0f7b3d;
+            --warn: #9a6700;
+            --bad: #b42318;
+            --skip: #57606a;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #101418;
+                --fg: #e6edf3;
+                --muted: #9aa4b2;
+                --line: #30363d;
+                --panel: #161b22;
+                --ok: #3fb950;
+                --warn: #d29922;
+                --bad: #ff7b72;
+                --skip: #8b949e;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        main {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 24px;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        button {
+            min-height: 36px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 0 14px;
+            background: var(--panel);
+            color: var(--fg);
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: progress;
+            opacity: .65;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--panel);
+            padding: 12px;
+            min-width: 0;
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .metric strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 15px;
+            font-weight: 650;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 980px;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid var(--line);
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            border-radius: 999px;
+            padding: 0 9px;
+            font-size: 12px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .status.detected,
+        .status.detected-with-error {
+            color: var(--ok);
+            background: color-mix(in srgb, var(--ok) 12%, transparent);
+        }
+
+        .status.not-detected {
+            color: var(--warn);
+            background: color-mix(in srgb, var(--warn) 14%, transparent);
+        }
+
+        .status.error {
+            color: var(--bad);
+            background: color-mix(in srgb, var(--bad) 12%, transparent);
+        }
+
+        .status.skipped {
+            color: var(--skip);
+            background: color-mix(in srgb, var(--skip) 14%, transparent);
+        }
+
+        .signals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .signal {
+            display: inline-flex;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 1px 7px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .empty {
+            color: var(--muted);
+        }
+
+        details {
+            margin-top: 16px;
+        }
+
+        pre {
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--panel);
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 760px) {
+            main {
+                padding: 20px 12px 32px;
+            }
+
+            header {
+                display: block;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 14px;
+            }
+
+            .summary {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <div>
+            <h1>Console Probe Report</h1>
+            <p>Runs the requested console serialization probes and renders per-test results.</p>
+        </div>
+        <button id="run-button" type="button">Run tests</button>
+    </header>
+
+    <section class="summary" aria-label="Summary">
+        <div class="metric">
+            <span>Status</span>
+            <strong id="summary-status">Not run</strong>
+        </div>
+        <div class="metric">
+            <span>Detected tests</span>
+            <strong id="summary-detected">0 / 0</strong>
+        </div>
+        <div class="metric">
+            <span>Total hits</span>
+            <strong id="summary-hits">0</strong>
+        </div>
+        <div class="metric">
+            <span>Token</span>
+            <strong id="summary-token">-</strong>
+        </div>
+    </section>
+
+    <section class="table-wrap" aria-label="Per-test report">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Call</th>
+                <th>Status</th>
+                <th>Expected signals</th>
+                <th>Actual signals</th>
+                <th>Hits</th>
+                <th>Errors</th>
+            </tr>
+            </thead>
+            <tbody id="report-body">
+            <tr>
+                <td colspan="7" class="empty">No results yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <details>
+        <summary>Text report</summary>
+        <pre id="report-text">No results yet.</pre>
+    </details>
+</main>
+
+<script src="./index.js"></script>
+<script>
+    (function () {
+        "use strict";
+
+        const runButton = document.getElementById("run-button");
+        const reportBody = document.getElementById("report-body");
+        const reportText = document.getElementById("report-text");
+        const summaryStatus = document.getElementById("summary-status");
+        const summaryDetected = document.getElementById("summary-detected");
+        const summaryHits = document.getElementById("summary-hits");
+        const summaryToken = document.getElementById("summary-token");
+
+        function text(value) {
+            return document.createTextNode(value == null ? "" : String(value));
+        }
+
+        function cell(content) {
+            const td = document.createElement("td");
+
+            if (content instanceof Node) {
+                td.appendChild(content);
+            } else {
+                td.appendChild(text(content));
+            }
+
+            return td;
+        }
+
+        function codeCell(value) {
+            const code = document.createElement("code");
+            code.appendChild(text(value));
+            return cell(code);
+        }
+
+        function signalList(values) {
+            if (!values.length) {
+                const span = document.createElement("span");
+                span.className = "empty";
+                span.textContent = "-";
+                return span;
+            }
+
+            const wrap = document.createElement("div");
+            wrap.className = "signals";
+
+            for (const value of values) {
+                const span = document.createElement("span");
+                span.className = "signal";
+                span.textContent = value;
+                wrap.appendChild(span);
+            }
+
+            return wrap;
+        }
+
+        function statusPill(status) {
+            const span = document.createElement("span");
+            span.className = "status " + status;
+            span.textContent = status;
+            return span;
+        }
+
+        function render(result) {
+            const detectedRows = result.report.filter((row) => row.detected).length;
+
+            summaryStatus.textContent = result.detected ? "Detected" : "No signal";
+            summaryDetected.textContent = detectedRows + " / " + result.report.length;
+            summaryHits.textContent = String(result.hits.length);
+            summaryToken.textContent = result.token;
+            reportText.textContent = result.reportText;
+            reportBody.textContent = "";
+
+            for (const row of result.report) {
+                const tr = document.createElement("tr");
+
+                tr.appendChild(cell(row.group));
+                tr.appendChild(codeCell(row.signature));
+                tr.appendChild(cell(statusPill(row.status)));
+                tr.appendChild(cell(signalList(row.expectedSignals)));
+                tr.appendChild(cell(signalList(row.hitSignals)));
+                tr.appendChild(cell(row.hitCount));
+                tr.appendChild(cell(row.errors.length ? row.errors.map((item) => item.message).join("; ") : "-"));
+
+                reportBody.appendChild(tr);
+            }
+        }
+
+        async function run() {
+            runButton.disabled = true;
+            runButton.textContent = "Running...";
+            summaryStatus.textContent = "Running";
+
+            try {
+                const result = await window.runConsoleProbeTests();
+                render(result);
+            } catch (error) {
+                summaryStatus.textContent = "Failed";
+                reportText.textContent = error && error.stack ? error.stack : String(error);
+            } finally {
+                runButton.disabled = false;
+                runButton.textContent = "Run tests";
+            }
+        }
+
+        runButton.addEventListener("click", run);
+        run();
+    })();
+</script>
+</body>
+</html>
