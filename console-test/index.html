@@ -46,7 +46,7 @@
     }
 
     main {
-      max-width: 1180px;
+      width: 100%;
       margin: 0 auto;
       padding: 28px 20px 40px;
     }
@@ -303,377 +303,377 @@
   </style>
 </head>
 <body>
-<main>
-  <header>
-    <div>
-      <h1>Console Probe Report</h1>
-      <p>Runs the requested console serialization probes and renders per-test results.</p>
-    </div>
-    <button id="run-button" type="button">Run tests</button>
-  </header>
+  <main>
+    <header>
+      <div>
+        <h1>Console Probe Report</h1>
+        <p>Runs the requested console serialization probes and renders per-test results.</p>
+      </div>
+      <button id="run-button" type="button">Run tests</button>
+    </header>
 
-  <nav class="tabs" aria-label="Report target">
-    <button class="tab-button active" type="button" data-target="top">Top page</button>
-    <button class="tab-button" type="button" data-target="iframe">Iframe</button>
-  </nav>
+    <nav class="tabs" aria-label="Report target">
+      <button class="tab-button active" type="button" data-target="top">Top page</button>
+      <button class="tab-button" type="button" data-target="iframe">Iframe</button>
+    </nav>
 
-  <section id="panel-top" class="tab-panel">
-    <section class="summary" aria-label="Top page summary">
-      <div class="metric">
-        <span>Status</span>
-        <strong id="top-summary-status">Not run</strong>
-      </div>
-      <div class="metric">
-        <span>Detected tests</span>
-        <strong id="top-summary-detected">0 / 0</strong>
-      </div>
-      <div class="metric">
-        <span>Total hits</span>
-        <strong id="top-summary-hits">0</strong>
-      </div>
-      <div class="metric">
-        <span>Token</span>
-        <strong id="top-summary-token">-</strong>
-      </div>
+    <section id="panel-top" class="tab-panel">
+      <section class="summary" aria-label="Top page summary">
+        <div class="metric">
+          <span>Status</span>
+          <strong id="top-summary-status">Not run</strong>
+        </div>
+        <div class="metric">
+          <span>Detected tests</span>
+          <strong id="top-summary-detected">0 / 0</strong>
+        </div>
+        <div class="metric">
+          <span>Total hits</span>
+          <strong id="top-summary-hits">0</strong>
+        </div>
+        <div class="metric">
+          <span>Token</span>
+          <strong id="top-summary-token">-</strong>
+        </div>
+      </section>
+
+      <section class="table-wrap" aria-label="Top page per-test report">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Call</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th>Expected signals</th>
+              <th>Actual signals</th>
+              <th>Hits</th>
+              <th>Errors</th>
+            </tr>
+          </thead>
+          <tbody id="top-report-body">
+            <tr>
+              <td colspan="8" class="empty">No results yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <details>
+        <summary>Text report</summary>
+        <pre id="top-report-text">No results yet.</pre>
+      </details>
     </section>
 
-    <section class="table-wrap" aria-label="Top page per-test report">
-      <table>
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>Call</th>
-          <th>Status</th>
-          <th>Duration</th>
-          <th>Expected signals</th>
-          <th>Actual signals</th>
-          <th>Hits</th>
-          <th>Errors</th>
-        </tr>
-        </thead>
-        <tbody id="top-report-body">
-        <tr>
-          <td colspan="8" class="empty">No results yet.</td>
-        </tr>
-        </tbody>
-      </table>
+    <section id="panel-iframe" class="tab-panel" hidden>
+      <section id="frame-box" class="frame-box" aria-label="Probe iframe">
+        <div id="frame-placeholder" class="frame-placeholder">Iframe will be created when this tab runs.</div>
+        <div class="frame-caption">The same probe suite is executed inside this iframe; its results are rendered below.</div>
+      </section>
+
+      <section class="summary" aria-label="Iframe summary">
+        <div class="metric">
+          <span>Status</span>
+          <strong id="iframe-summary-status">Not run</strong>
+        </div>
+        <div class="metric">
+          <span>Detected tests</span>
+          <strong id="iframe-summary-detected">0 / 0</strong>
+        </div>
+        <div class="metric">
+          <span>Total hits</span>
+          <strong id="iframe-summary-hits">0</strong>
+        </div>
+        <div class="metric">
+          <span>Token</span>
+          <strong id="iframe-summary-token">-</strong>
+        </div>
+      </section>
+
+      <section class="table-wrap" aria-label="Iframe per-test report">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Call</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th>Expected signals</th>
+              <th>Actual signals</th>
+              <th>Hits</th>
+              <th>Errors</th>
+            </tr>
+          </thead>
+          <tbody id="iframe-report-body">
+            <tr>
+              <td colspan="8" class="empty">No results yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <details>
+        <summary>Text report</summary>
+        <pre id="iframe-report-text">No results yet.</pre>
+      </details>
     </section>
+  </main>
 
-    <details>
-      <summary>Text report</summary>
-      <pre id="top-report-text">No results yet.</pre>
-    </details>
-  </section>
+  <script src="./index.js"></script>
+  <script>
+    (function () {
+      "use strict";
 
-  <section id="panel-iframe" class="tab-panel" hidden>
-    <section id="frame-box" class="frame-box" aria-label="Probe iframe">
-      <div id="frame-placeholder" class="frame-placeholder">Iframe will be created when this tab runs.</div>
-      <div class="frame-caption">The same probe suite is executed inside this iframe; its results are rendered below.</div>
-    </section>
+      const runButton = document.getElementById("run-button");
+      const tabButtons = [...document.querySelectorAll(".tab-button")];
+      const panels = {
+        top: document.getElementById("panel-top"),
+        iframe: document.getElementById("panel-iframe")
+      };
+      const contexts = {
+        top: {
+          run: () => window.runConsoleProbeTests(),
+          summaryStatus: document.getElementById("top-summary-status"),
+          summaryDetected: document.getElementById("top-summary-detected"),
+          summaryHits: document.getElementById("top-summary-hits"),
+          summaryToken: document.getElementById("top-summary-token"),
+          reportBody: document.getElementById("top-report-body"),
+          reportText: document.getElementById("top-report-text"),
+          hasRun: false
+        },
+        iframe: {
+          run: () => startIframeRun(),
+          summaryStatus: document.getElementById("iframe-summary-status"),
+          summaryDetected: document.getElementById("iframe-summary-detected"),
+          summaryHits: document.getElementById("iframe-summary-hits"),
+          summaryToken: document.getElementById("iframe-summary-token"),
+          reportBody: document.getElementById("iframe-report-body"),
+          reportText: document.getElementById("iframe-report-text"),
+          hasRun: false
+        }
+      };
+      let activeTarget = "top";
+      let probeFrame = null;
+      let iframeRunResolve = null;
+      let iframeRunReject = null;
+      let iframeRunTimer = null;
 
-    <section class="summary" aria-label="Iframe summary">
-      <div class="metric">
-        <span>Status</span>
-        <strong id="iframe-summary-status">Not run</strong>
-      </div>
-      <div class="metric">
-        <span>Detected tests</span>
-        <strong id="iframe-summary-detected">0 / 0</strong>
-      </div>
-      <div class="metric">
-        <span>Total hits</span>
-        <strong id="iframe-summary-hits">0</strong>
-      </div>
-      <div class="metric">
-        <span>Token</span>
-        <strong id="iframe-summary-token">-</strong>
-      </div>
-    </section>
+      function createProbeFrame(reload) {
+        if (probeFrame && !reload) return probeFrame;
 
-    <section class="table-wrap" aria-label="Iframe per-test report">
-      <table>
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>Call</th>
-          <th>Status</th>
-          <th>Duration</th>
-          <th>Expected signals</th>
-          <th>Actual signals</th>
-          <th>Hits</th>
-          <th>Errors</th>
-        </tr>
-        </thead>
-        <tbody id="iframe-report-body">
-        <tr>
-          <td colspan="8" class="empty">No results yet.</td>
-        </tr>
-        </tbody>
-      </table>
-    </section>
+        if (probeFrame) {
+          probeFrame.remove();
+          probeFrame = null;
+        }
 
-    <details>
-      <summary>Text report</summary>
-      <pre id="iframe-report-text">No results yet.</pre>
-    </details>
-  </section>
-</main>
+        const frameBox = document.getElementById("frame-box");
+        const shadowRoot = frameBox.attachShadow({ mode: "closed" });
+        const placeholder = document.getElementById("frame-placeholder");
+        const caption = frameBox.querySelector(".frame-caption");
+        const frame = document.createElement("iframe");
 
-<script src="./index.js"></script>
-<script>
-  (function () {
-    "use strict";
+        frame.id = "probe-frame";
+        frame.title = "Console probe iframe";
+        frame.src = "./frame.html";
+        frame.allow = "cross-origin-isolated; fullscreen; autoplay; keyboard-map; gamepad";
+        frame.sandbox = "allow-same-origin allow-scripts allow-poups";
 
-    const runButton = document.getElementById("run-button");
-    const tabButtons = [...document.querySelectorAll(".tab-button")];
-    const panels = {
-      top: document.getElementById("panel-top"),
-      iframe: document.getElementById("panel-iframe")
-    };
-    const contexts = {
-      top: {
-        run: () => window.runConsoleProbeTests(),
-        summaryStatus: document.getElementById("top-summary-status"),
-        summaryDetected: document.getElementById("top-summary-detected"),
-        summaryHits: document.getElementById("top-summary-hits"),
-        summaryToken: document.getElementById("top-summary-token"),
-        reportBody: document.getElementById("top-report-body"),
-        reportText: document.getElementById("top-report-text"),
-        hasRun: false
-      },
-      iframe: {
-        run: () => startIframeRun(),
-        summaryStatus: document.getElementById("iframe-summary-status"),
-        summaryDetected: document.getElementById("iframe-summary-detected"),
-        summaryHits: document.getElementById("iframe-summary-hits"),
-        summaryToken: document.getElementById("iframe-summary-token"),
-        reportBody: document.getElementById("iframe-report-body"),
-        reportText: document.getElementById("iframe-report-text"),
-        hasRun: false
-      }
-    };
-    let activeTarget = "top";
-    let probeFrame = null;
-    let iframeRunResolve = null;
-    let iframeRunReject = null;
-    let iframeRunTimer = null;
+        shadowRoot.appendChild(frame);
+        shadowRoot.appendChild(caption);
+        // frameBox.insertBefore(frame, caption);
+        if (placeholder) placeholder.remove();
+        probeFrame = frame;
 
-    function createProbeFrame(reload) {
-      if (probeFrame && !reload) return probeFrame;
-
-      if (probeFrame) {
-        probeFrame.remove();
-        probeFrame = null;
-      }
-
-      const frameBox = document.getElementById("frame-box");
-      const shadowRoot = frameBox.attachShadow({ mode: "closed" });
-      const placeholder = document.getElementById("frame-placeholder");
-      const caption = frameBox.querySelector(".frame-caption");
-      const frame = document.createElement("iframe");
-
-      frame.id = "probe-frame";
-      frame.title = "Console probe iframe";
-      frame.src = "./frame.html";
-      frame.allow = "cross-origin-isolated; fullscreen; autoplay; keyboard-map; gamepad";
-      frame.sandbox = "allow-same-origin allow-scripts allow-popups";
-
-      shadowRoot.appendChild(frame);
-      shadowRoot.appendChild(caption);
-      // frameBox.insertBefore(frame, caption);
-      if (placeholder) placeholder.remove();
-      probeFrame = frame;
-
-      return frame;
-    }
-
-    function text(value) {
-      return document.createTextNode(value == null ? "" : String(value));
-    }
-
-    function cell(content) {
-      const td = document.createElement("td");
-
-      if (content instanceof Node) {
-        td.appendChild(content);
-      } else {
-        td.appendChild(text(content));
+        return frame;
       }
 
-      return td;
-    }
+      function text(value) {
+        return document.createTextNode(value == null ? "" : String(value));
+      }
 
-    function codeCell(value) {
-      const code = document.createElement("code");
-      code.appendChild(text(value));
-      return cell(code);
-    }
+      function cell(content) {
+        const td = document.createElement("td");
 
-    function signalList(values, counts) {
-      if (!values.length) {
+        if (content instanceof Node) {
+          td.appendChild(content);
+        } else {
+          td.appendChild(text(content));
+        }
+
+        return td;
+      }
+
+      function codeCell(value) {
+        const code = document.createElement("code");
+        code.appendChild(text(value));
+        return cell(code);
+      }
+
+      function signalList(values, counts) {
+        if (!values.length) {
+          const span = document.createElement("span");
+          span.className = "empty";
+          span.textContent = "-";
+          return span;
+        }
+
+        const wrap = document.createElement("div");
+        wrap.className = "signals";
+
+        for (const value of values) {
+          const span = document.createElement("span");
+          span.className = "signal";
+          span.textContent = counts && counts[value] ? value + " x" + counts[value] : value;
+          wrap.appendChild(span);
+        }
+
+        return wrap;
+      }
+
+      function statusPill(status) {
         const span = document.createElement("span");
-        span.className = "empty";
-        span.textContent = "-";
+        span.className = "status " + status;
+        span.textContent = status;
         return span;
       }
 
-      const wrap = document.createElement("div");
-      wrap.className = "signals";
-
-      for (const value of values) {
-        const span = document.createElement("span");
-        span.className = "signal";
-        span.textContent = counts && counts[value] ? value + " x" + counts[value] : value;
-        wrap.appendChild(span);
+      function formatDurationMs(durationMs) {
+        return typeof durationMs === "number" ? durationMs.toFixed(3) + " ms" : "-";
       }
 
-      return wrap;
-    }
+      function render(target, result) {
+        const context = contexts[target];
+        const detectedRows = result.report.filter((row) => row.detected).length;
 
-    function statusPill(status) {
-      const span = document.createElement("span");
-      span.className = "status " + status;
-      span.textContent = status;
-      return span;
-    }
+        context.summaryStatus.textContent = result.detected ? "Detected" : "No signal";
+        context.summaryDetected.textContent = detectedRows + " / " + result.report.length;
+        context.summaryHits.textContent = String(result.hits.length);
+        context.summaryToken.textContent = result.token;
+        context.reportText.textContent = result.reportText;
+        context.reportBody.textContent = "";
+        context.hasRun = true;
 
-    function formatDurationMs(durationMs) {
-      return typeof durationMs === "number" ? durationMs.toFixed(3) + " ms" : "-";
-    }
+        for (const row of result.report) {
+          const tr = document.createElement("tr");
 
-    function render(target, result) {
-      const context = contexts[target];
-      const detectedRows = result.report.filter((row) => row.detected).length;
+          tr.appendChild(cell(row.group));
+          tr.appendChild(codeCell(row.signature));
+          tr.appendChild(cell(statusPill(row.status)));
+          tr.appendChild(cell(formatDurationMs(row.durationMs)));
+          tr.appendChild(cell(signalList(row.expectedSignals)));
+          tr.appendChild(cell(signalList(row.hitSignals, row.signalCounts)));
+          tr.appendChild(cell(row.hitCount));
+          tr.appendChild(cell(row.errors.length ? row.errors.map((item) => item.message).join("; ") : "-"));
 
-      context.summaryStatus.textContent = result.detected ? "Detected" : "No signal";
-      context.summaryDetected.textContent = detectedRows + " / " + result.report.length;
-      context.summaryHits.textContent = String(result.hits.length);
-      context.summaryToken.textContent = result.token;
-      context.reportText.textContent = result.reportText;
-      context.reportBody.textContent = "";
-      context.hasRun = true;
-
-      for (const row of result.report) {
-        const tr = document.createElement("tr");
-
-        tr.appendChild(cell(row.group));
-        tr.appendChild(codeCell(row.signature));
-        tr.appendChild(cell(statusPill(row.status)));
-        tr.appendChild(cell(formatDurationMs(row.durationMs)));
-        tr.appendChild(cell(signalList(row.expectedSignals)));
-        tr.appendChild(cell(signalList(row.hitSignals, row.signalCounts)));
-        tr.appendChild(cell(row.hitCount));
-        tr.appendChild(cell(row.errors.length ? row.errors.map((item) => item.message).join("; ") : "-"));
-
-        context.reportBody.appendChild(tr);
+          context.reportBody.appendChild(tr);
+        }
       }
-    }
 
-    function activateTab(target) {
-      activeTarget = target;
+      function activateTab(target) {
+        activeTarget = target;
+
+        for (const button of tabButtons) {
+          button.classList.toggle("active", button.dataset.target === target);
+        }
+
+        for (const [name, panel] of Object.entries(panels)) {
+          panel.hidden = name !== target;
+        }
+
+        if (target === "iframe" && !contexts.iframe.hasRun) {
+          run();
+        }
+      }
+
+      function clearIframeRunTimer() {
+        if (iframeRunTimer) {
+          clearTimeout(iframeRunTimer);
+          iframeRunTimer = null;
+        }
+      }
+
+      function handleIframeMessage(event) {
+        if (!probeFrame || event.source !== probeFrame.contentWindow) return;
+
+        const data = event.data || {};
+        const context = contexts.iframe;
+
+        if (data.type === "console-probe-frame-ready") {
+          context.summaryStatus.textContent = "Running";
+          return;
+        }
+
+        if (data.type !== "console-probe-result") return;
+
+        clearIframeRunTimer();
+
+        if (data.error) {
+          context.summaryStatus.textContent = "Failed";
+          context.reportText.textContent = data.error;
+
+          if (iframeRunReject) iframeRunReject(new Error(data.error));
+        } else {
+          render("iframe", data.result);
+
+          if (iframeRunResolve) iframeRunResolve(data.result);
+        }
+
+        iframeRunResolve = null;
+        iframeRunReject = null;
+      }
+
+      function startIframeRun() {
+        clearIframeRunTimer();
+
+        if (iframeRunReject) {
+          iframeRunReject(new Error("Iframe probe run was replaced"));
+        }
+
+        createProbeFrame(true);
+
+        return new Promise((resolve, reject) => {
+          iframeRunResolve = resolve;
+          iframeRunReject = reject;
+          iframeRunTimer = setTimeout(() => {
+            iframeRunResolve = null;
+            iframeRunReject = null;
+            iframeRunTimer = null;
+            reject(new Error("Iframe probe result timed out"));
+          }, 5000);
+        });
+      }
+
+      async function run() {
+        const target = activeTarget;
+        const context = contexts[target];
+
+        runButton.disabled = true;
+        runButton.textContent = "Running...";
+        context.summaryStatus.textContent = "Running";
+
+        try {
+          const result = await context.run();
+          if (target !== "iframe") {
+            render(target, result);
+          }
+        } catch (error) {
+          context.summaryStatus.textContent = "Failed";
+          context.reportText.textContent = error && error.stack ? error.stack : String(error);
+        } finally {
+          runButton.disabled = false;
+          runButton.textContent = "Run tests";
+        }
+      }
+
+      window.addEventListener("message", handleIframeMessage);
 
       for (const button of tabButtons) {
-        button.classList.toggle("active", button.dataset.target === target);
+        button.addEventListener("click", () => activateTab(button.dataset.target));
       }
 
-      for (const [name, panel] of Object.entries(panels)) {
-        panel.hidden = name !== target;
-      }
-
-      if (target === "iframe" && !contexts.iframe.hasRun) {
-        run();
-      }
-    }
-
-    function clearIframeRunTimer() {
-      if (iframeRunTimer) {
-        clearTimeout(iframeRunTimer);
-        iframeRunTimer = null;
-      }
-    }
-
-    function handleIframeMessage(event) {
-      if (!probeFrame || event.source !== probeFrame.contentWindow) return;
-
-      const data = event.data || {};
-      const context = contexts.iframe;
-
-      if (data.type === "console-probe-frame-ready") {
-        context.summaryStatus.textContent = "Running";
-        return;
-      }
-
-      if (data.type !== "console-probe-result") return;
-
-      clearIframeRunTimer();
-
-      if (data.error) {
-        context.summaryStatus.textContent = "Failed";
-        context.reportText.textContent = data.error;
-
-        if (iframeRunReject) iframeRunReject(new Error(data.error));
-      } else {
-        render("iframe", data.result);
-
-        if (iframeRunResolve) iframeRunResolve(data.result);
-      }
-
-      iframeRunResolve = null;
-      iframeRunReject = null;
-    }
-
-    function startIframeRun() {
-      clearIframeRunTimer();
-
-      if (iframeRunReject) {
-        iframeRunReject(new Error("Iframe probe run was replaced"));
-      }
-
-      createProbeFrame(true);
-
-      return new Promise((resolve, reject) => {
-        iframeRunResolve = resolve;
-        iframeRunReject = reject;
-        iframeRunTimer = setTimeout(() => {
-          iframeRunResolve = null;
-          iframeRunReject = null;
-          iframeRunTimer = null;
-          reject(new Error("Iframe probe result timed out"));
-        }, 5000);
-      });
-    }
-
-    async function run() {
-      const target = activeTarget;
-      const context = contexts[target];
-
-      runButton.disabled = true;
-      runButton.textContent = "Running...";
-      context.summaryStatus.textContent = "Running";
-
-      try {
-        const result = await context.run();
-        if (target !== "iframe") {
-          render(target, result);
-        }
-      } catch (error) {
-        context.summaryStatus.textContent = "Failed";
-        context.reportText.textContent = error && error.stack ? error.stack : String(error);
-      } finally {
-        runButton.disabled = false;
-        runButton.textContent = "Run tests";
-      }
-    }
-
-    window.addEventListener("message", handleIframeMessage);
-
-    for (const button of tabButtons) {
-      button.addEventListener("click", () => activateTab(button.dataset.target));
-    }
-
-    runButton.addEventListener("click", run);
-    run();
-  })();
-</script>
+      runButton.addEventListener("click", run);
+      run();
+    })();
+  </script>
 </body>
 </html>

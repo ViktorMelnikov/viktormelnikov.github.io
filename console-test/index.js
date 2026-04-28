@@ -2,20 +2,73 @@
   "use strict";
 
   const DEFAULT_WAIT_MS = 50;
+  const COUNT_LABEL = "\0";
+  const CONSOLE_FORMAT = "%c%d";
+  const CONSOLE_FORMAT_STYLE = "font-size:0;color:transparent";
 
-  const ERROR_CONSOLE_CALLS = [
-    { method: "count", args: ["string", "error"] },
-    { method: "countReset", args: ["string", "error"] },
-    { method: "debug", args: ["string", "string", "error"] },
+  const BASE_ERROR_CONSOLE_CALLS = [
+    { method: "count", args: ["countLabel", "error"] },
+    { method: "countReset", args: ["countLabel", "error"] },
+    { method: "debug", args: ["format", "formatStyle", "error"] },
     { method: "dir", args: ["string", "error"] },
-    { method: "dirxml", args: ["string", "string", "error"] },
-    { method: "error", args: ["string", "string", "error"] },
-    { method: "info", args: ["string", "string", "error"] },
-    { method: "log", args: ["string", "string", "error"] },
-    { method: "table", args: ["string", "string", "error"] },
-    { method: "trace", args: ["string", "string", "error"] },
-    { method: "warn", args: ["string", "string", "error"] }
+    { method: "dirxml", args: ["format", "formatStyle", "error"] },
+    { method: "error", args: ["format", "formatStyle", "error"] },
+    { method: "info", args: ["format", "formatStyle", "error"] },
+    { method: "log", args: ["format", "formatStyle", "error"] },
+    { method: "table", args: ["format", "formatStyle", "error"] },
+    { method: "trace", args: ["format", "formatStyle", "error"] },
+    { method: "warn", args: ["format", "formatStyle", "error"] }
   ];
+
+  const ERROR_COERCION_VARIANTS = [
+    {
+      idSuffix: "without-own-toString",
+      errorLabel: "errorWithoutOwnToString",
+      titleSuffix: "without own toString",
+      expectedExtraSignals: []
+    },
+    {
+      idSuffix: "with-own-toString",
+      errorLabel: "errorWithOwnToString",
+      titleSuffix: "with own toString",
+      coercionProbe: "ownToString",
+      expectedExtraSignals: ["toString-call"]
+    },
+    {
+      idSuffix: "with-toString-getter",
+      errorLabel: "errorWithToStringGetter",
+      titleSuffix: "with toString getter",
+      coercionProbe: "toStringGetter",
+      expectedExtraSignals: ["toString-get", "toString-call"]
+    },
+    {
+      idSuffix: "with-valueOf",
+      errorLabel: "errorWithValueOf",
+      titleSuffix: "with valueOf",
+      coercionProbe: "valueOf",
+      expectedExtraSignals: ["valueOf-call"]
+    },
+    {
+      idSuffix: "with-toPrimitive",
+      errorLabel: "errorWithToPrimitive",
+      titleSuffix: "with Symbol.toPrimitive",
+      coercionProbe: "toPrimitive",
+      expectedExtraSignals: ["toPrimitive-call"]
+    },
+    {
+      idSuffix: "with-proxy",
+      errorLabel: "errorWithProxy",
+      titleSuffix: "wrapped in Proxy",
+      coercionProbe: "proxy",
+      expectedExtraSignals: ["proxy-get"]
+    }
+  ];
+
+  const ERROR_CONSOLE_CALLS = BASE_ERROR_CONSOLE_CALLS.flatMap((spec) =>
+    spec.args.includes("error")
+      ? ERROR_COERCION_VARIANTS.map((variant) => ({ ...spec, ...variant }))
+      : [spec]
+  );
 
   const STATIC_TESTS = [
     {
@@ -73,19 +126,33 @@
     return [...new Set(values)];
   }
 
-  function makeErrorTestId(method) {
-    return "04-error-" + method;
+  function makeErrorTestId(spec) {
+    return (
+      "04-error-" + spec.method + (spec.idSuffix ? "-" + spec.idSuffix : "")
+    );
   }
 
   function makeErrorSignature(spec) {
     const args = spec.args
       .map((type, index) => {
-        if (type === "error") return "error";
+        if (type === "error") return spec.errorLabel || "error";
+        if (type === "countLabel") return "<0x00>";
+        if (type === "format") return '"%c%d"';
+        if (type === "formatStyle") return '"font-size:0;color:transparent"';
         return "string" + (index + 1);
       })
       .join(", ");
 
     return "console." + spec.method + "(" + args + ")";
+  }
+
+  function makeErrorExpectedSignals(spec) {
+    return [
+      "stack-get",
+      "name-get",
+      "message-get",
+      ...(spec.expectedExtraSignals || [])
+    ];
   }
 
   function registerTest(state, definition) {
@@ -241,10 +308,11 @@
     return anchor;
   }
 
-  function makeErrorProbe(state, token, method, testId) {
+  function makeErrorProbe(state, token, method, testId, options) {
     const test = "error-accessor";
     const record = makeHitRecorder(state, test, { testId, method });
     const error = new Error();
+    const settings = options || {};
 
     function wrap(prop, value) {
       safeDefine(
@@ -268,14 +336,107 @@
     wrap("name", "ConsoleProbeError");
     wrap("message", "console-probe-error-" + token);
 
+    function errorString() {
+      return "ConsoleProbeError: console-probe-error-" + token;
+    }
+
+    if (settings.coercionProbe === "ownToString") {
+      safeDefine(
+        error,
+        "toString",
+        {
+          configurable: true,
+          enumerable: false,
+          writable: true,
+          value: function errorToStringProbe() {
+            record("toString-call");
+            return errorString();
+          }
+        },
+        state,
+        test,
+        testId
+      );
+    } else if (settings.coercionProbe === "toStringGetter") {
+      safeDefine(
+        error,
+        "toString",
+        {
+          configurable: true,
+          enumerable: false,
+          get: function errorToStringGetterProbe() {
+            record("toString-get");
+
+            return function errorToStringProbe() {
+              record("toString-call");
+              return errorString();
+            };
+          }
+        },
+        state,
+        test,
+        testId
+      );
+    } else if (settings.coercionProbe === "valueOf") {
+      safeDefine(
+        error,
+        "valueOf",
+        {
+          configurable: true,
+          enumerable: false,
+          writable: true,
+          value: function errorValueOfProbe() {
+            record("valueOf-call");
+            return 0;
+          }
+        },
+        state,
+        test,
+        testId
+      );
+    } else if (
+      settings.coercionProbe === "toPrimitive" &&
+      typeof Symbol === "function" &&
+      Symbol.toPrimitive
+    ) {
+      safeDefine(
+        error,
+        Symbol.toPrimitive,
+        {
+          configurable: true,
+          enumerable: false,
+          writable: true,
+          value: function errorToPrimitiveProbe(hint) {
+            record("toPrimitive-call");
+            return hint === "number" ? 0 : errorString();
+          }
+        },
+        state,
+        test,
+        testId
+      );
+    }
+
+    if (settings.coercionProbe === "proxy" && typeof Proxy === "function") {
+      return new Proxy(error, {
+        get: function errorProxyGetProbe(target, prop, receiver) {
+          record("proxy-get");
+          return Reflect.get(target, prop, receiver);
+        }
+      });
+    }
+
     return error;
   }
 
   function buildConsoleArgs(spec, state, token, testId) {
     return spec.args.map((type, index) => {
       if (type === "error") {
-        return makeErrorProbe(state, token, spec.method, testId);
+        return makeErrorProbe(state, token, spec.method, testId, spec);
       }
+      if (type === "countLabel") return COUNT_LABEL;
+      if (type === "format") return CONSOLE_FORMAT;
+      if (type === "formatStyle") return CONSOLE_FORMAT_STYLE;
       return "console-probe " + spec.method + " arg" + index + " " + token;
     });
   }
@@ -437,7 +598,7 @@
     );
 
     for (const spec of ERROR_CONSOLE_CALLS) {
-      const testId = makeErrorTestId(spec.method);
+      const testId = makeErrorTestId(spec);
 
       registerTest(state, {
         id: testId,
@@ -445,10 +606,11 @@
         title:
           "console." +
           spec.method +
-          " with Error stack/name/message getters",
+          " with Error stack/name/message getters" +
+          (spec.titleSuffix ? " " + spec.titleSuffix : ""),
         method: spec.method,
         signature: makeErrorSignature(spec),
-        expectedSignals: ["stack-get", "name-get", "message-get"]
+        expectedSignals: makeErrorExpectedSignals(spec)
       });
 
       runConsoleMethod(
