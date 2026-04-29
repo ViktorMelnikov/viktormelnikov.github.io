@@ -178,6 +178,14 @@
       background: var(--panel);
     }
 
+    .table-wrap tr:hover {
+      background-color: #f0f0f0;
+    }
+
+    .table-wrap tr.active {
+      background-color: #D8DEE7FF;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -565,6 +573,10 @@
           tr.appendChild(cell(signalList(row.hitSignals, row.signalCounts)));
           tr.appendChild(cell(row.hitCount));
           tr.appendChild(cell(row.errors.length ? row.errors.map((item) => item.message).join("; ") : "-"));
+          tr.addEventListener('click', () => {
+            context.reportBody.querySelectorAll('tr.active').forEach((row) => row.classList.remove('active'));
+            tr.classList.add('active');
+          });
 
           context.reportBody.appendChild(tr);
         }
