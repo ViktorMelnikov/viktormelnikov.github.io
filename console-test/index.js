@@ -1,3 +1,4 @@
+console.info('Start index.js script');
 (function attachConsoleProbeTests(global) {
   "use strict";
 
