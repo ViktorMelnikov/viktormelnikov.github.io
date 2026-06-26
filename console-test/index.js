@@ -71,6 +71,10 @@ console.info('Start index.js script');
       : [spec]
   );
 
+  const DEFERRED_ERROR_CONSOLE_CALLS = BASE_ERROR_CONSOLE_CALLS.filter((spec) =>
+    spec.args.includes("error")
+  ).map((spec) => ({ ...spec, errorLabel: spec.errorLabel || "error" }));
+
   const STATIC_TESTS = [
     {
       id: "01-regexp-log-toString-value",
@@ -133,8 +137,8 @@ console.info('Start index.js script');
     );
   }
 
-  function makeErrorSignature(spec) {
-    const args = spec.args
+  function makeErrorArgList(spec) {
+    return spec.args
       .map((type, index) => {
         if (type === "error") return spec.errorLabel || "error";
         if (type === "countLabel") return "<0x00>";
@@ -143,8 +147,10 @@ console.info('Start index.js script');
         return "string" + (index + 1);
       })
       .join(", ");
+  }
 
-    return "console." + spec.method + "(" + args + ")";
+  function makeErrorSignature(spec) {
+    return "console." + spec.method + "(" + makeErrorArgList(spec) + ")";
   }
 
   function makeErrorExpectedSignals(spec) {
@@ -154,6 +160,16 @@ console.info('Start index.js script');
       "message-get",
       ...(spec.expectedExtraSignals || [])
     ];
+  }
+
+  function makeDeferredErrorTestId(spec) {
+    return "05-settimeout-" + spec.method;
+  }
+
+  function makeDeferredErrorSignature(spec) {
+    return (
+      "setTimeout(console." + spec.method + ", 0, " + makeErrorArgList(spec) + ")"
+    );
   }
 
   function registerTest(state, definition) {
@@ -193,6 +209,41 @@ console.info('Start index.js script');
       call.endedAt = now();
       call.durationMs =
         call.startedAt === null ? null : call.endedAt - call.startedAt;
+      state.errors.push({
+        testId,
+        method,
+        message: error && error.message ? error.message : String(error),
+        at: now()
+      });
+    }
+  }
+
+  function runConsoleMethodViaSetTimeout(method, args, state, testId, delay) {
+    const fn = console[method];
+    const call = {
+      testId,
+      method,
+      argc: args.length,
+      skipped: typeof fn !== "function",
+      deferred: true,
+      delay: delay || 0,
+      startedAt: null,
+      endedAt: null,
+      durationMs: null,
+      at: now()
+    };
+
+    state.calls.push(call);
+
+    if (typeof fn !== "function") return;
+
+    try {
+      call.startedAt = now();
+      // Faithfully replicates `setTimeout(console.debug, 0, error)`:
+      // the method reference is detached from `console` and invoked
+      // asynchronously by the host, so `this` is not the console object.
+      setTimeout(fn, call.delay, ...args);
+    } catch (error) {
       state.errors.push({
         testId,
         method,
@@ -619,6 +670,30 @@ console.info('Start index.js script');
         buildConsoleArgs(spec, state, token, testId),
         state,
         testId
+      );
+    }
+
+    for (const spec of DEFERRED_ERROR_CONSOLE_CALLS) {
+      const testId = makeDeferredErrorTestId(spec);
+
+      registerTest(state, {
+        id: testId,
+        group: "5",
+        title:
+          "setTimeout(console." +
+          spec.method +
+          ", 0, error) with Error stack/name/message getters",
+        method: spec.method,
+        signature: makeDeferredErrorSignature(spec),
+        expectedSignals: makeErrorExpectedSignals(spec)
+      });
+
+      runConsoleMethodViaSetTimeout(
+        spec.method,
+        buildConsoleArgs(spec, state, token, testId),
+        state,
+        testId,
+        0
       );
     }
 
